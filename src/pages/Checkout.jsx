@@ -1,11 +1,12 @@
 import { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
 import { db, auth } from "../firebase";
 
 function Checkout() {
   const { cart } = useContext(CartContext);
+  const navigate = useNavigate();
 
   const [name, setName] = useState("");
   const [mobile, setMobile] = useState("");
@@ -25,7 +26,8 @@ function Checkout() {
     const user = auth.currentUser;
 
     if (!user) {
-      alert("Please login first");
+      alert("Please Login First");
+      navigate("/login");
       return;
     }
 
@@ -54,7 +56,7 @@ function Checkout() {
           alert("✅ Payment Successful!");
           alert("✅ Order Saved Successfully!");
 
-          window.location.href = "/myorders";
+          navigate("/myorders");
         } catch (error) {
           console.error(error);
           alert("❌ Order Save Failed");
@@ -129,7 +131,7 @@ function Checkout() {
             onClick={placeOrder}
             className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700"
           >
-            💳 Pay with Razorpay
+            Pay with Razorpay
           </button>
         </>
       )}
