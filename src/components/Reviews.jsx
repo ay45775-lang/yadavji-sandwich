@@ -3,6 +3,8 @@ import {
   addDoc,
   collection,
   getDocs,
+  deleteDoc,
+  doc,
   Timestamp,
 } from "firebase/firestore";
 import { db } from "../firebase";
@@ -81,7 +83,25 @@ setRatingCount(counts);
     if (!name || !review) {
       alert("Please fill all fields");
       return;
-    }
+    } 
+    const deleteReview = async (id) => {
+  const confirmDelete = window.confirm(
+    "Are you sure you want to delete this review?"
+  );
+
+  if (!confirmDelete) return;
+
+  try {
+    await deleteDoc(doc(db, "reviews", id));
+
+    alert("🗑️ Review Deleted Successfully");
+
+    fetchReviews();
+  } catch (error) {
+    console.log(error);
+    alert("Delete Failed");
+  }
+};
 
     try {
       await addDoc(collection(db, "reviews"), {
@@ -252,6 +272,12 @@ setRatingCount(counts);
     ? item.createdAt.toDate().toLocaleTimeString("en-IN")
     : ""}
 </p>
+<button
+  onClick={() => deleteReview(item.id)}
+  className="mt-4 bg-red-600 hover:bg-red-700 text-white px-5 py-2 rounded-lg"
+>
+  🗑 Delete Review
+</button>
           </div>
         ))
       )}
