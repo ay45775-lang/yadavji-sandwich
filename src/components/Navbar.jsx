@@ -2,7 +2,6 @@ import { Link, useNavigate } from "react-router-dom";
 import { signOut } from "firebase/auth";
 import { auth } from "../firebase";
 
-
 function Navbar() {
   const navigate = useNavigate();
 
@@ -24,21 +23,53 @@ function Navbar() {
           🥪 Yadavji Sandwich
         </h1>
 
-        <div className="flex gap-6">
+        <div className="flex gap-6 items-center">
 
-          <Link to="/">Home</Link>
+          <Link
+            to="/"
+            className="hover:text-yellow-300"
+          >
+            Home
+          </Link>
 
-          <Link to="/cart">Cart</Link>
+          <Link
+            to="/cart"
+            className="hover:text-yellow-300"
+          >
+            Cart
+          </Link>
 
-          <Link to="/myorders">My Orders</Link>
+          <Link
+            to="/wishlist"
+            className="hover:text-red-300 font-semibold"
+          >
+            ❤️ Wishlist
+          </Link>
 
-          <Link to="/admin">Admin</Link>
+          <Link
+            to="/myorders"
+            className="hover:text-yellow-300"
+          >
+            My Orders
+          </Link>
 
-          <Link to="/contact">Contact</Link>
+          <Link
+            to="/admin"
+            className="hover:text-yellow-300"
+          >
+            Admin
+          </Link>
+
+          <Link
+            to="/contact"
+            className="hover:text-yellow-300"
+          >
+            Contact
+          </Link>
 
           <button
             onClick={logout}
-            className="bg-red-600 px-4 py-1 rounded"
+            className="bg-red-600 px-4 py-1 rounded hover:bg-red-700"
           >
             Logout
           </button>
