@@ -3,7 +3,7 @@ import {
   addDoc,
   collection,
   getDocs,
-  serverTimestamp,
+  Timestamp,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -88,7 +88,7 @@ setRatingCount(counts);
         name,
         review,
         rating,
-        createdAt: serverTimestamp(),
+        createdAt: Timestamp.now(),
       });
 
       alert("⭐ Review Submitted Successfully");
@@ -239,6 +239,19 @@ setRatingCount(counts);
             <p className="mt-3 text-gray-700">
               {item.review}
             </p>
+            <p className="text-sm text-gray-500 mt-2">
+  📅{" "}
+  {item.createdAt?.toDate
+    ? item.createdAt.toDate().toLocaleDateString("en-IN")
+    : "N/A"}
+
+  {" | "}
+
+  🕒{" "}
+  {item.createdAt?.toDate
+    ? item.createdAt.toDate().toLocaleTimeString("en-IN")
+    : ""}
+</p>
           </div>
         ))
       )}
