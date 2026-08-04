@@ -4,8 +4,6 @@ import {
   collection,
   getDocs,
   serverTimestamp,
-  query,
-  orderBy,
 } from "firebase/firestore";
 import { db } from "../firebase";
 
@@ -21,19 +19,14 @@ function Reviews() {
 
   const fetchReviews = async () => {
     try {
-      const q = query(
-        collection(db, "reviews"),
-        orderBy("createdAt", "desc")
-      );
-
-      const snapshot = await getDocs(q);
+      const snapshot = await getDocs(collection(db, "reviews"));
 
       const data = snapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
 
-      setReviews(data);
+      setReviews(data.reverse());
     } catch (error) {
       console.log(error);
     }
@@ -70,7 +63,6 @@ function Reviews() {
 
   return (
     <div className="max-w-5xl mx-auto p-6">
-
       <h1 className="text-4xl font-bold text-center mb-8">
         ⭐ Customer Reviews
       </h1>
@@ -79,7 +71,6 @@ function Reviews() {
         onSubmit={submitReview}
         className="bg-white shadow-lg rounded-xl p-6 mb-10"
       >
-
         <input
           type="text"
           placeholder="Your Name"
@@ -96,9 +87,7 @@ function Reviews() {
           onChange={(e) => setReview(e.target.value)}
         />
 
-        <label className="font-bold">
-          Rating
-        </label>
+        <label className="font-bold">Rating</label>
 
         <select
           className="w-full border p-3 rounded mt-2 mb-4"
@@ -118,7 +107,6 @@ function Reviews() {
         >
           Submit Review
         </button>
-
       </form>
 
       <h2 className="text-3xl font-bold mb-6">
@@ -126,19 +114,21 @@ function Reviews() {
       </h2>
 
       {reviews.length === 0 ? (
-        <p>No Reviews Yet</p>
+        <p className="text-center text-gray-500 text-lg">
+          No Reviews Yet
+        </p>
       ) : (
         reviews.map((item) => (
           <div
             key={item.id}
-            className="border rounded-xl shadow-lg p-5 mb-5"
+            className="border rounded-xl shadow-lg p-5 mb-5 bg-white"
           >
             <h3 className="text-2xl font-bold">
               👤 {item.name}
             </h3>
 
-            <p className="text-yellow-500 text-xl">
-              {"⭐".repeat(item.rating)}
+            <p className="text-yellow-500 text-xl mt-2">
+              {"⭐".repeat(item.rating || 5)}
             </p>
 
             <p className="mt-3 text-gray-700">
@@ -151,4 +141,4 @@ function Reviews() {
   );
 }
 
-export default Reviews;
+export default Reviews;   
