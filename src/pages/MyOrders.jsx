@@ -10,23 +10,31 @@ function MyOrders() {
 
   useEffect(() => {
     const fetchOrders = async () => {
-      const user = auth.currentUser;
+      try {
+        const user = auth.currentUser;
 
-      if (!user) {
-        alert("Please login first");
-        return;
+        if (!user) {
+          alert("Please login first");
+          return;
+        }
+
+        const querySnapshot = await getDocs(collection(db, "orders"));
+
+        const data = querySnapshot.docs
+          .map((doc) => ({
+            id: doc.id,
+            ...doc.data(),
+          }))
+          .filter(
+            (order) =>
+              order.uid === user.uid ||
+              order.email === user.email
+          );
+
+        setOrders(data);
+      } catch (error) {
+        console.log(error);
       }
-
-      const querySnapshot = await getDocs(collection(db, "orders"));
-
-      const data = querySnapshot.docs
-        .map((doc) => ({
-          id: doc.id,
-          ...doc.data(),
-        }))
-        .filter((order) => order.email === user.email);
-
-      setOrders(data);
     };
 
     fetchOrders();
@@ -46,11 +54,13 @@ function MyOrders() {
         orders.map((order) => (
           <div
             key={order.id}
-            className="border rounded-xl shadow p-5 mb-5"
+            className="border rounded-xl shadow-lg p-5 mb-5"
           >
             <h2 className="text-2xl font-bold">
               👤 {order.customerName}
             </h2>
+
+            <p>📧 {order.email}</p>
 
             <p>📱 {order.mobile}</p>
 

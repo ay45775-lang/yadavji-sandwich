@@ -2,7 +2,7 @@ import { useContext, useState } from "react";
 import { CartContext } from "../context/CartContext";
 import { Link } from "react-router-dom";
 import { addDoc, collection, serverTimestamp } from "firebase/firestore";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 
 function Checkout() {
   const { cart } = useContext(CartContext);
@@ -22,6 +22,13 @@ function Checkout() {
       return;
     }
 
+    const user = auth.currentUser;
+
+    if (!user) {
+      alert("Please login first");
+      return;
+    }
+
     const options = {
       key: "rzp_test_TLIEGAbhzLKQ1S",
       amount: total * 100,
@@ -33,6 +40,8 @@ function Checkout() {
         try {
           await addDoc(collection(db, "orders"), {
             customerName: name,
+            email: user.email,
+            uid: user.uid,
             mobile: mobile,
             address: address,
             items: cart,
@@ -45,8 +54,7 @@ function Checkout() {
           alert("✅ Payment Successful!");
           alert("✅ Order Saved Successfully!");
 
-          console.log(response.razorpay_payment_id);
-
+          window.location.href = "/myorders";
         } catch (error) {
           console.error(error);
           alert("❌ Order Save Failed");
@@ -55,6 +63,7 @@ function Checkout() {
 
       prefill: {
         name: name,
+        email: user.email,
         contact: mobile,
       },
 
@@ -118,9 +127,9 @@ function Checkout() {
 
           <button
             onClick={placeOrder}
-            className="w-full bg-green-600 text-white py-3 rounded-lg"
+            className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700"
           >
-            Pay with Razorpay
+            💳 Pay with Razorpay
           </button>
         </>
       )}

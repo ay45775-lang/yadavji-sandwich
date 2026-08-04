@@ -18,34 +18,32 @@ function Admin() {
     try {
       const querySnapshot = await getDocs(collection(db, "orders"));
 
+      console.log("Total Docs:", querySnapshot.size);
+
       const data = querySnapshot.docs.map((doc) => ({
         id: doc.id,
         ...doc.data(),
       }));
 
+      console.log("Orders:", data);
+
       setOrders(data);
     } catch (error) {
-      console.log(error);
+      console.error("Firestore Error:", error);
     }
   };
 
   const updateStatus = async (id, status) => {
     try {
       await updateDoc(doc(db, "orders", id), {
-        status: status,
+        status,
       });
 
-      setOrders(
-        orders.map((order) =>
-          order.id === id
-            ? { ...order, status: status }
-            : order
-        )
-      );
+      alert("✅ Status Updated");
 
-      alert("✅ Status Updated Successfully");
+      fetchOrders();
     } catch (error) {
-      console.log(error);
+      console.error(error);
       alert("❌ Status Update Failed");
     }
   };
@@ -70,16 +68,16 @@ function Admin() {
               👤 {order.customerName}
             </h2>
 
-            <p>📱 Mobile : {order.mobile}</p>
+            <p>📱 Mobile: {order.mobile}</p>
 
-            <p>📍 Address : {order.address}</p>
+            <p>📍 Address: {order.address}</p>
 
             <p className="font-bold text-green-700 mt-2">
-              💰 Total : ₹{order.total}
+              💰 Total: ₹{order.total}
             </p>
 
             <p className="mt-2">
-              📌 Status :
+              📌 Status:
               <span className="font-bold text-orange-600">
                 {" "}
                 {order.status}
@@ -88,28 +86,22 @@ function Admin() {
 
             <div className="mt-5 flex gap-3 flex-wrap">
               <button
-                onClick={() =>
-                  updateStatus(order.id, "Accepted")
-                }
-                className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+                onClick={() => updateStatus(order.id, "Accepted")}
+                className="bg-blue-600 text-white px-4 py-2 rounded"
               >
                 Accept
               </button>
 
               <button
-                onClick={() =>
-                  updateStatus(order.id, "Preparing")
-                }
-                className="bg-yellow-500 text-white px-4 py-2 rounded hover:bg-yellow-600"
+                onClick={() => updateStatus(order.id, "Preparing")}
+                className="bg-yellow-500 text-white px-4 py-2 rounded"
               >
                 Preparing
               </button>
 
               <button
-                onClick={() =>
-                  updateStatus(order.id, "Delivered")
-                }
-                className="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700"
+                onClick={() => updateStatus(order.id, "Delivered")}
+                className="bg-green-600 text-white px-4 py-2 rounded"
               >
                 Delivered
               </button>
