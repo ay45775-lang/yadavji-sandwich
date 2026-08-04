@@ -28,7 +28,8 @@ function Reviews() {
 
       setReviews(data.reverse());
     } catch (error) {
-      console.log(error);
+      console.error("Fetch Error:", error);
+      alert(error.message);
     }
   };
 
@@ -42,9 +43,9 @@ function Reviews() {
 
     try {
       await addDoc(collection(db, "reviews"), {
-        name,
-        review,
-        rating,
+        name: name,
+        review: review,
+        rating: rating,
         createdAt: serverTimestamp(),
       });
 
@@ -56,8 +57,10 @@ function Reviews() {
 
       fetchReviews();
     } catch (error) {
-      console.log(error);
-      alert("Error submitting review");
+      console.error("Submit Error:", error);
+
+      // ✅ अब असली Error दिखेगा
+      alert(error.message);
     }
   };
 
@@ -141,4 +144,4 @@ function Reviews() {
   );
 }
 
-export default Reviews;   
+export default Reviews;
