@@ -16,6 +16,14 @@ function Reviews() {
   const [averageRating, setAverageRating] = useState(0);
   const [totalReviews, setTotalReviews] = useState(0);
 
+  const [ratingCount, setRatingCount] = useState({
+  5: 0,
+  4: 0,
+  3: 0,
+  2: 0,
+  1: 0,
+});
+
   useEffect(() => {
     fetchReviews();
   }, []);
@@ -35,6 +43,21 @@ function Reviews() {
 
       const total = data.length;
       setTotalReviews(total);
+      const counts = {
+  5: 0,
+  4: 0,
+  3: 0,
+  2: 0,
+  1: 0,
+};
+
+data.forEach((item) => {
+  if (counts[item.rating] !== undefined) {
+    counts[item.rating]++;
+  }
+});
+
+setRatingCount(counts);
 
       if (total > 0) {
         const sum = data.reduce(
@@ -151,6 +174,43 @@ function Reviews() {
         <p className="text-gray-700 font-semibold mt-2">
           Based on {totalReviews} Reviews
         </p>
+
+        <div className="mt-6 space-y-3">
+
+  {[5,4,3,2,1].map((star) => (
+
+    <div
+      key={star}
+      className="flex items-center gap-3"
+    >
+
+      <span className="w-10">
+        {star}⭐
+      </span>
+
+      <div className="flex-1 bg-gray-300 rounded-full h-3">
+
+        <div
+          className="bg-yellow-500 h-3 rounded-full"
+          style={{
+            width:
+              totalReviews === 0
+                ? "0%"
+                : `${(ratingCount[star] / totalReviews) * 100}%`,
+          }}
+        ></div>
+
+      </div>
+
+      <span className="w-8 text-right">
+        {ratingCount[star]}
+      </span>
+
+    </div>
+
+  ))}
+
+</div>
 
       </div>
 
