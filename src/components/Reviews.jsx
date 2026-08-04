@@ -1,37 +1,153 @@
+import { useEffect, useState } from "react";
+import {
+  addDoc,
+  collection,
+  getDocs,
+  serverTimestamp,
+  query,
+  orderBy,
+} from "firebase/firestore";
+import { db } from "../firebase";
+
 function Reviews() {
-  const reviews = [
-    {
-      name: "Rahul",
-      review: "Best Sandwich in Mumbai! ⭐⭐⭐⭐⭐",
-    },
-    {
-      name: "Priya",
-      review: "Very tasty and fresh. ⭐⭐⭐⭐⭐",
-    },
-    {
-      name: "Aman",
-      review: "Fast delivery and amazing taste. ⭐⭐⭐⭐⭐",
-    },
-  ];
+  const [name, setName] = useState("");
+  const [review, setReview] = useState("");
+  const [rating, setRating] = useState(5);
+  const [reviews, setReviews] = useState([]);
+
+  useEffect(() => {
+    fetchReviews();
+  }, []);
+
+  const fetchReviews = async () => {
+    try {
+      const q = query(
+        collection(db, "reviews"),
+        orderBy("createdAt", "desc")
+      );
+
+      const snapshot = await getDocs(q);
+
+      const data = snapshot.docs.map((doc) => ({
+        id: doc.id,
+        ...doc.data(),
+      }));
+
+      setReviews(data);
+    } catch (error) {
+      console.log(error);
+    }
+  };
+
+  const submitReview = async (e) => {
+    e.preventDefault();
+
+    if (!name || !review) {
+      alert("Please fill all fields");
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, "reviews"), {
+        name,
+        review,
+        rating,
+        createdAt: serverTimestamp(),
+      });
+
+      alert("⭐ Review Submitted Successfully");
+
+      setName("");
+      setReview("");
+      setRating(5);
+
+      fetchReviews();
+    } catch (error) {
+      console.log(error);
+      alert("Error submitting review");
+    }
+  };
 
   return (
-    <section className="py-16 bg-gray-100">
-      <h2 className="text-4xl font-bold text-center mb-10">
-        Customer Reviews
+    <div className="max-w-5xl mx-auto p-6">
+
+      <h1 className="text-4xl font-bold text-center mb-8">
+        ⭐ Customer Reviews
+      </h1>
+
+      <form
+        onSubmit={submitReview}
+        className="bg-white shadow-lg rounded-xl p-6 mb-10"
+      >
+
+        <input
+          type="text"
+          placeholder="Your Name"
+          className="w-full border p-3 rounded mb-4"
+          value={name}
+          onChange={(e) => setName(e.target.value)}
+        />
+
+        <textarea
+          placeholder="Write your review..."
+          className="w-full border p-3 rounded mb-4"
+          rows="4"
+          value={review}
+          onChange={(e) => setReview(e.target.value)}
+        />
+
+        <label className="font-bold">
+          Rating
+        </label>
+
+        <select
+          className="w-full border p-3 rounded mt-2 mb-4"
+          value={rating}
+          onChange={(e) => setRating(Number(e.target.value))}
+        >
+          <option value={5}>⭐⭐⭐⭐⭐ (5)</option>
+          <option value={4}>⭐⭐⭐⭐ (4)</option>
+          <option value={3}>⭐⭐⭐ (3)</option>
+          <option value={2}>⭐⭐ (2)</option>
+          <option value={1}>⭐ (1)</option>
+        </select>
+
+        <button
+          type="submit"
+          className="w-full bg-green-600 text-white py-3 rounded-lg hover:bg-green-700"
+        >
+          Submit Review
+        </button>
+
+      </form>
+
+      <h2 className="text-3xl font-bold mb-6">
+        All Reviews
       </h2>
 
-      <div className="max-w-6xl mx-auto grid md:grid-cols-3 gap-8 px-6">
-        {reviews.map((item, index) => (
+      {reviews.length === 0 ? (
+        <p>No Reviews Yet</p>
+      ) : (
+        reviews.map((item) => (
           <div
-            key={index}
-            className="bg-white shadow-lg rounded-xl p-6"
+            key={item.id}
+            className="border rounded-xl shadow-lg p-5 mb-5"
           >
-            <h3 className="text-xl font-bold">{item.name}</h3>
-            <p className="mt-4">{item.review}</p>
+            <h3 className="text-2xl font-bold">
+              👤 {item.name}
+            </h3>
+
+            <p className="text-yellow-500 text-xl">
+              {"⭐".repeat(item.rating)}
+            </p>
+
+            <p className="mt-3 text-gray-700">
+              {item.review}
+            </p>
           </div>
-        ))}
-      </div>
-    </section>
+        ))
+      )}
+    </div>
   );
 }
 
