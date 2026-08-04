@@ -12,6 +12,7 @@ import Checkout from "./pages/Checkout";
 import Admin from "./pages/Admin";
 import MyOrders from "./pages/MyOrders";
 import Contact from "./pages/Contact";
+import Wishlist from "./pages/Wishlist";
 
 function App() {
   return (
