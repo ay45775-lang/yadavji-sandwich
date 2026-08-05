@@ -1,8 +1,16 @@
 import { useEffect, useState, useContext } from "react";
-import { collection, getDocs } from "firebase/firestore";
+import {
+  collection,
+  getDocs,
+  addDoc,
+  deleteDoc,
+  doc,
+  query,
+  where,
+} from "firebase/firestore";
 import { Link } from "react-router-dom";
 import HeroSlider from "../components/HeroSlider";
-import { db } from "../firebase";
+import { db, auth } from "../firebase";
 import { CartContext } from "../context/CartContext";
 
 function Home() {
@@ -13,13 +21,38 @@ function Home() {
 
   const { cart, addToCart } = useContext(CartContext);
 
-  const toggleWishlist = (id) => {
-    if (wishlist.includes(id)) {
-      setWishlist(wishlist.filter((item) => item !== id));
-    } else {
-      setWishlist([...wishlist, id]);
+  const toggleWishlist = async (item) => {
+  const user = auth.currentUser;
+
+  if (!user) {
+    alert("Please login first");
+    return;
+  }
+
+  try {
+    if (wishlist.includes(item.id)) {
+      alert("Already in Wishlist ❤️");
+      return;
     }
-  };
+
+    await addDoc(collection(db, "wishlist"), {
+      uid: user.uid,
+      email: user.email,
+      sandwichId: item.id,
+      name: item.name,
+      price: item.price,
+      image: item.image,
+      rating: item.rating,
+    });
+
+    setWishlist([...wishlist, item.id]);
+
+    alert("❤️ Added to Wishlist");
+  } catch (error) {
+    console.log(error);
+    alert(error.message);
+  }
+};
 
   useEffect(() => {
   const fetchSandwiches = async () => {
@@ -164,7 +197,7 @@ const filteredSandwiches = sandwiches
             </div>
 
             <button
-              onClick={() => toggleWishlist(item.id)}
+              onClick={() => toggleWishlist(item)}
               className="absolute top-3 right-3 bg-white rounded-full p-2 shadow-lg"
             >
               {wishlist.includes(item.id) ? "❤️" : "🤍"}
